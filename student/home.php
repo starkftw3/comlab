@@ -1,7 +1,9 @@
 <?php
+
 session_start();
-if (!isset($_SESSION["user"])) {
+if (!isset($_SESSION["loggedin"])) {
    header("Location: studentlogin.php");
+   exit();
 }
 
 ?>
