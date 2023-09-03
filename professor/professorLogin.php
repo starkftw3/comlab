@@ -49,24 +49,6 @@ if (isset($_SESSION["user"])) {
                     echo "<div class='alert alert-danger'>All fields are required/div>"; 
                 }
 
-                //     require_once "../connection/database.php";
-                //     $sql = "SELECT * FROM faculty WHERE facultyid = '$facultyid'";
-                //     $result = mysqli_query($conn, $sql);
-                //     $facultyid = mysqli_fetch_array($result, MYSQLI_ASSOC);
-                //     if ($facultyid) {
-                //         if (password_verify($password, $facultyid["password"])) {
-                //             session_start();
-                //             $_SESSION["user"] = "yes";
-                //             header("Location: home.php");
-                //             die();
-                //         }else{
-                //             echo "<div class='alert alert-danger'>Password does not match</div>";
-                //         }
-                //     }else{
-                //         echo "<div class='alert alert-danger'>Email does not match</div>";
-                //     }
-                // }
-
                 else{        
                     require_once "../connection/database.php";
                     // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
