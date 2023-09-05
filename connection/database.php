@@ -5,8 +5,8 @@ $dbUser = "root";
 $dbPassword = "";
 $dbName = "comlab";
 $conn = mysqli_connect($hostName, $dbUser, $dbPassword, $dbName);
-if (!$conn) {
-    die("Something went wrong;");
-}
 
-?>
+if (mysqli_connect_errno()) {
+    exit('Failed to connect to MySQL: ' . mysqli_connect_error());
+}
+ ?>
