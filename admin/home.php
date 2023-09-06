@@ -1,64 +1,170 @@
 <?php
 session_start();
-if (!isset($_SESSION["loggedin"])) {
+
+if (!isset($_SESSION["admin"])) {
    header("Location: adminlogin.php");
    exit();
 }
 
-require_once "../connection/database.php";
+$page = "Dashboard";
+include '../partial/sidebar.php';
+include '../partial/header.php';
 
-// Fetch pending student registrations from the database
-if ($stmt = $conn->prepare('SELECT studentid, full_name FROM student WHERE status = ?')) {
-    $status = 'pending';
-    $stmt->bind_param('s', $status);
-    $stmt->execute();
-    $result = $stmt->get_result();
-}
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel='stylesheet' href='../resources/style.css'>
-    <title>Pending Student Registrations</title>
-</head>
-<body>
-    <h1>Pending Student Registrations</h1>
-    <?php
-        if (isset($_GET['success']) && $_GET['success'] == 1) {
-        echo "<div class='alert alert-success'>Update successful!</div>";
-        }
-    ?>
+    <div class="main-content">
+        <main>
+            <div class="cards">
+                <a class="card-single" href="">
+                    <div>
+                        <h1>69</h1>
+                        <span>Pending Registration of Students</span>
+                    </div>
+                    <div>
+                        <span class="las la-user"></span>
+                    </div>
+                </a>
+                <a class="card-single" href="">
+                    <div>
+                        <h1>6</h1>
+                        <span>Pending Registration of Faculty Members</span>
+                    </div>
+                    <div>
+                        <span class="las la-users"></span>
+                    </div>
+                </a>
+                <a class="card-single" href="">
+                    <div>
+                        <h1>19</h1>
+                        <span>Total Available Dates</span>
+                    </div>
+                    <div>
+                        <span class="las la-calendar"></span>
+                    </div>
+                </a>
+                <a class="card-single" href="">
+                    <div>
+                        <h1>190</h1>
+                        <span>Total Users</span>
+                    </div>
+                    <div>
+                        <span class="las la-user-circle"></span>
+                    </div>
+                </a>
+            </div>
+            <div class="recent-grid">
+                <div class="div students">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Complaints/Issues</h3>
 
-    <table >
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Full Name</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($row['studentid']); ?></td>
-                    <td><?php echo htmlspecialchars($row['full_name']); ?></td>
-                    <td>
-                        <form action="../includes/process_approval.php" method="post">
-                            <input type="hidden" name="student_id" value="<?php echo $row['studentid']; ?>">
-                            <button type="submit" name="approve">Approve</button>
-                        </form>
-                        <form action="../includes/process_approval.php" method="post">
-                            <input type="hidden" name="student_id" value="<?php echo $row['studentid']; ?>">
-                            <button type="submit" name="reject">Reject</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
-</body>
-</html>
+                            <button>See all <span class="las la-arrow-right">
+                            </span></button>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table width="100%">
+                                    <thead>
+                                        <tr>
+                                            <td>Department</td>
+                                            <td>Name</td>
+                                            <td>Yr & Sec</td>
+                                            <td>Status</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Info Tech</td>
+                                            <td>Roronoa Zorojuro</td>
+                                            <td>IT41</td>
+                                            <td>
+                                                <span class="status green"></span>
+                                                In progress
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Engineering</td>
+                                            <td>Roronoa Zorojuro</td>
+                                            <td>IT32</td>
+                                            <td>
+                                                <span class="status pink"></span>
+                                                Reviewing
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Entrepreneur</td>
+                                            <td>Roronoa Zorojuro</td>
+                                            <td>IT42</td>
+                                            <td>
+                                                <span class="status red"></span>
+                                                Tatapon na
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="requests">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Requests</h3>
+
+                            <button>See all <span class="las la-arrow-right">
+                            </span></button>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="user">
+                                <div class="info">
+                                    <div>
+                                        <h4>Kozuki Oden</h4>
+                                        <small>CET Professor</small>
+                                    </div>
+                                </div>
+                                <div class="contact">
+                                    <span class="las la-comment"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="user">
+                                <div class="info">
+                                    <div>
+                                        <h4>Kozuki Oden</h4>
+                                        <small>CET Professor</small>
+                                    </div>
+                                </div>
+                                <div class="contact">
+                                    <span class="las la-comment"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="user">
+                                <div class="info">
+                                    <div>
+                                        <h4>Kozuki Oden</h4>
+                                        <small>CET Professor</small>
+                                    </div>
+                                </div>
+                                <div class="contact">
+                                    <span class="las la-comment"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+
+    
+   

@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION["user"])) {
+if (isset($_SESSION["professor"])) {
    header("Location: home.php");
 }
 ?>
@@ -69,7 +69,7 @@ if (isset($_SESSION["user"])) {
                                 // Create sessions, so we know the user is logged in, they basically act like cookies but remember the data on the server.
                                 else if($status === 'approved'){
                                     session_regenerate_id();
-                                    $_SESSION['loggedin'] = TRUE;
+                                    $_SESSION['professor'] = TRUE;
                                     $_SESSION['name'] = $fullname;
                                     $_SESSION['facultyid'] = $_POST['facultyid'];
                                     header('Location: home.php');

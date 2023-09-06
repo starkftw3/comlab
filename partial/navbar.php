@@ -16,7 +16,7 @@
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="student/studentlogin.php">Student</a>
-              <a class="dropdown-item" href="professor/professorLogin.php"> Faculty</a>
+              <a class="dropdown-item" href="professor/professorLogin.php">Faculty</a>
           </li>
       </ul>
     </nav>
