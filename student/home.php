@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-if (!isset($_SESSION["loggedin"])) {
+if (!isset($_SESSION["student"])) {
    header("Location: studentlogin.php");
    exit();
 }
@@ -22,5 +22,19 @@ if (!isset($_SESSION["loggedin"])) {
         <h1>Welcome to Dashboard</h1>
         <a href="../includes/logout.php" class="btn btn-warning">Logout</a>
     </div>
+    <main>
+        <h2>Report</h2>
+        <form action="../includes/submitreport.php">
+        <select id="computers" name="computers">
+            <option value="computer 1">computer 1</option>
+            <option value="computer 2">computer 2</option>
+            <option value="computer 3">computer 3</option>
+            <option value="computer 4">computer 4</option>
+        </select> 
+            <input type="text" placeholder="Enter Report" name="report" />
+            <textarea name="description" placeholder="Enter Description" style="width:200px; height:50px; resize: none;"></textarea>
+            <input type="submit" value="report" name="submit-report"/>
+        </form>
+    </main>
 </body>
 </html>

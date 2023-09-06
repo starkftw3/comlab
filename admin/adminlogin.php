@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION["loggedin"])) {
+if (isset($_SESSION["admin"])) {
    header("Location: home.php");
 }
 ?>
@@ -21,10 +21,10 @@ if (isset($_SESSION["loggedin"])) {
         <h1>Admin Login</h1>
             <?php
             if (isset($_POST["adminlogin"])) {
-                 $studentid = $_POST["adminid"];
+                 $adminid = $_POST["adminid"];
                  $password = $_POST["password"];
             
-                if (empty($studentid) OR empty($password)) {
+                if (empty($adminid) OR empty($password)) {
                     echo "<div class='alert alert-danger'>All fields are required</div>"; 
                     
                 }else{        
@@ -42,7 +42,7 @@ if (isset($_SESSION["loggedin"])) {
                             // Account exists, now we verify the password
                             if (password_verify($_POST['password'], $dbpassword)) {
                                 session_regenerate_id();
-                                $_SESSION['loggedin'] = TRUE;
+                                $_SESSION['admin'] = TRUE;
                                 $_SESSION['name'] = $fullname;
                                 $_SESSION['adminid'] = $_POST['adminid'];
                                 header('Location: home.php');
