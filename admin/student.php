@@ -1,9 +1,10 @@
 <?php 
 
-// if (!isset($_SESSION["admin"])) {
-//     header("Location: adminlogin.php");
-//     exit();
-//  }
+session_start();
+if (!isset($_SESSION["admin"])) {
+    header("Location: adminlogin.php");
+    exit();
+ }
 $page = "Student Registration";
 include '../partial/sidebar.php';
 include '../partial/header.php';
@@ -12,37 +13,40 @@ include '../partial/header.php';
 require_once "../connection/database.php";
 
 // Fetch pending student registrations from the database
-if ($stmt = $conn->prepare('SELECT studentid, full_name FROM student WHERE status = ?')) {
-    $status = 'pending';
+$status = 'pending';
+
+try {
+    $stmt = $conn->prepare('SELECT studentid, firstname, lastname, middlename, section, email FROM problemreport WHERE status = ?');
     $stmt->bind_param('s', $status);
     $stmt->execute();
     $result = $stmt->get_result();
+} catch (Exception $e) {
+    // Handle database errors here.
+    die('Database error: ' . $e->getMessage());
 }
-
 ?>
-<div class="main-content">
-    <main>
-        <h1>Pending Student Registrations</h1>
-            <?php
-                if (isset($_GET['success']) && $_GET['success'] == 1) {
-                echo "<div class='alert alert-success'>Update successful!</div>";
-                }
-            ?>
-
-            <table>
-                <thead>
+    <div class="main-content">
+        <main>
+                <table>
                     <tr>
-                        <th>Student ID</th>
-                        <th>Full Name</th>
+                        <th>Student-ID</th>
+                        <th>Firstname</th>
+                        <th>Lastname</th>
+                        <th>Middlename</th>
+                        <th>Section</th>
+                        <th>Email</th>
                         <th>Action</th>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['studentid']); ?></td>
-                            <td><?php echo htmlspecialchars($row['full_name']); ?></td>
-                            <td>
+                    <tr>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                        <td data-cell="student-id"><?php echo htmlspecialchars($row['studentid']); ?></td>
+                        <td data-cell="firstname"><?php echo htmlspecialchars($row['firstname']); ?></td>
+                        <td data-cell="lastname"><?php echo htmlspecialchars($row['lastname']); ?></td>
+                        <td data-cell="middlename"><?php echo htmlspecialchars($row['middlename']); ?></td>
+                        <td data-cell="section"><?php echo htmlspecialchars($row['section']); ?></td>
+                        <td data-cell="email"><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td data-cell="action">
+                            <div class="action-flex">
                                 <form action="../includes/process_approval.php" method="post">
                                     <input type="hidden" name="student_id" value="<?php echo $row['studentid']; ?>">
                                     <button type="submit" name="approve">Approve</button>
@@ -51,12 +55,12 @@ if ($stmt = $conn->prepare('SELECT studentid, full_name FROM student WHERE statu
                                     <input type="hidden" name="student_id" value="<?php echo $row['studentid']; ?>">
                                     <button type="submit" name="reject">Reject</button>
                                 </form>
-                            </td>
-                        </tr>
+                            </div>
+                        </td>
+                    </tr>
                     <?php endwhile; ?>
-                </tbody>
-            </table>
-    </main>
-</div>
+                </table>
+        </main>
+    </div>
 </body>
 </html>
