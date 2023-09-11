@@ -12,7 +12,7 @@ if (isset($_SESSION["professor"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <link rel="stylesheet" href="../resources/style.css">
+    <link rel="stylesheet" href="style-professor.css">
 </head>
 <body>
     <nav class="navbar navbar-light bg-light">
@@ -37,9 +37,7 @@ if (isset($_SESSION["professor"])) {
       </ul>
     </nav>
     
-    <div class="form">
         <div class="container">
-        <h1>Professor Login</h1>
             <?php
             if (isset($_POST["login"])) {
                 $facultyid = $_POST["facultyid"];
@@ -52,13 +50,13 @@ if (isset($_SESSION["professor"])) {
                 else{        
                     require_once "../connection/database.php";
                     // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-                    if ($stmt = $conn->prepare('SELECT full_name, password, status FROM faculty WHERE facultyid = ?')) {
+                    if ($stmt = $conn->prepare('SELECT firstname, lastname, middlename, password, status FROM faculty WHERE facultyid = ?')) {
                         $stmt->bind_param('s', $_POST['facultyid']);
                         $stmt->execute();
                         // Store the result so we can check if the account exists in the database.
                         $stmt->store_result();
                         if ($stmt->num_rows > 0) {
-                            $stmt->bind_result($fullname, $dbpassword, $status);
+                            $stmt->bind_result($firstname, $lastname, $middlename, $dbpassword, $status);
                             $stmt->fetch();
                             // Account exists, now we verify the password.
 
@@ -70,12 +68,12 @@ if (isset($_SESSION["professor"])) {
                                 else if($status === 'approved'){
                                     session_regenerate_id();
                                     $_SESSION['professor'] = TRUE;
-                                    $_SESSION['name'] = $fullname;
+                                    $_SESSION['name'] = $firstname +" "+ + $middlename + " " +$lastname;;
                                     $_SESSION['facultyid'] = $_POST['facultyid'];
                                     header('Location: home.php');
                                 }
-                                else if($status === 'reject'){
-                                    echo "<div class='alert alert-danger'>Your account is reject. Contact Admin. This account will be deleted</div>";
+                                else if($status === 'rejected'){
+                                    echo "<div class='alert alert-danger'>Your account is reject. Contact Admin.</div>";
                                 }
                             } else {
                                 // Incorrect password
@@ -90,20 +88,30 @@ if (isset($_SESSION["professor"])) {
                 }
             }
             ?>
-        <form action="professorLogin.php" method="post">
-            <div class="form-group">
-                <input type="text" placeholder="Enter Faculty Id:" name="facultyid" class="form-control">
-            </div>
-            <div class="form-group">
-                <input type="password" placeholder="Enter Password:" name="password" class="form-control">
-            </div>
-            <div class="form-btn">
-                <input type="submit" value="Login" name="login" class="btn btn-primary">
-            </div>
-        </form>
-        <div><p>Not registered yet <a href="professorRegister.php">Register Here</a></p></div>
+            <!-- <form action="professorLogin.php" method="post">
+                <div class="form-group">
+                    <input type="text" placeholder="Enter Faculty Id:" name="facultyid" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Enter Password:" name="password" class="form-control">
+                </div>
+                <div class="form-btn">
+                    <input type="submit" value="Login" name="login" class="btn btn-primary">
+                </div>
+            </form>
+            <div><p>Not registered yet <a href="professorRegister.php">Register Here</a></p></div> -->
+            <form class="form" action="professorlogin.php" method="POST">
+                <span class="title">Professor Login </span>
+                <label>
+                    <input required="" placeholder="Student-ID" type="text" name="facultyid" class="input">
+                </label>
+                <label>
+                    <input required="" placeholder="Password" type="password" name="password" class="input">
+                </label>
+                <button type="submit" name="studentlogin" class="submit">Login</button>
+                <p class="signin">No Account ? <a href="professorRegister.php">Signup</a> </p>
+            </form>
         </div>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

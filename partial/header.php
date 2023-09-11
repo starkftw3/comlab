@@ -1,12 +1,11 @@
 <?php
-    session_start();
     require_once "../connection/database.php";
 ?>
 
 <header>
     <h2>
         <label for="nav-toggle">
-            <span class="las la-bars"></span>
+            <span class="fa fa-bars"></span>
         </label>
         <?=$page?>
     </h2>
