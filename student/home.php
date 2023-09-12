@@ -25,11 +25,13 @@ if (!isset($_SESSION["student"])) {
 
     <div>
 
-        <!-- get the session section
-             get the date today
-             find the session section === calendar database section
-             find the date today === calendar database date
+        <!--
+            get the session section
+            get the date today
+            find the session section === calendar database section
+            find the date today === calendar database date
         -->
+
         <?php
         date_default_timezone_set('Asia/Manila');
         $currentDateTime = date('Y-m-d');
@@ -38,7 +40,6 @@ if (!isset($_SESSION["student"])) {
         echo $studentSection;
         require_once "../connection/database.php";
 
-        //think if the section will be in the select or the date
         try {
             $stmt = $conn->prepare('SELECT date FROM calendar WHERE section = ?');
             $stmt->bind_param('s', $studentSection);
@@ -46,33 +47,32 @@ if (!isset($_SESSION["student"])) {
             $results = $stmt->get_result();
             
         } catch (Exception $e) {
-            // Handle database errors here.
             die('Database error: ' . $e->getMessage());
         }
 
         $matchFound = false;
-        
 
-        // fix this plss.
+        // fix this plss
         if ($results->num_rows > 0) {
-        while ($row = $results->fetch_assoc()) {
+            while ($row = $results->fetch_assoc()) {
         // Compare the 'date' from the database to the current date
-        if ($row["date"] === $currentDateTime) {
-            echo "Yes<br>";
-            $matchFound = true;
-            break; // 
+            if ($row["date"] === $currentDateTime) {
+                echo "Yes<br>";
+                $matchFound = true;
+                break;
             }
         }
 
         if (!$matchFound) {
-        echo "No matching date found.<br>";
-        }
-        } else {
-        echo "No results found.";
+            echo "No matching date found.<br>";
         }
 
-    
+        } else {
+            echo "No results found.";
+        }
+
         ?>
+
         <?php
             if($matchFound){
                 echo"<h2>Attendance</h2>";
@@ -83,7 +83,6 @@ if (!isset($_SESSION["student"])) {
                 echo "</div>";
             }
         ?>
-            
         
     <main class="report">
         <h2 class="title-report">Report</h2>
