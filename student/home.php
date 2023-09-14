@@ -1,12 +1,37 @@
 <?php
-
 session_start();
 if (!isset($_SESSION["student"])) {
-   header("Location: studentlogin.php");
-   exit();
+    header("Location: studentlogin.php");
+    exit();
 }
 
+require_once "../connection/database.php"; // Include your database connection file here
+
+// Get user information from the session
+$studentName = $_SESSION["name"];
+$studentSection = $_SESSION['section'];
+$studentId = $_SESSION['studentid'];
+
+// Function to check if an event is valid for marking attendance
+function isAttendanceAllowed($eventDate, $eventTimeIn, $eventTimeOut, $currentDateTime) {
+    return ($eventDate === $currentDateTime && $eventTimeIn <= $currentDateTime && $eventTimeOut >= $currentDateTime);
+}
+
+try {
+    date_default_timezone_set('Asia/Manila');
+    $currentDateTime = date('Y-m-d H:i:s');
+
+    // Query the database to get upcoming events for the student's section
+    $stmt = $conn->prepare('SELECT date, timein, timeout FROM calendar WHERE section = ?');
+    $stmt->bind_param('s', $studentSection);
+    $stmt->execute();
+    $results = $stmt->get_result();
+
+} catch (Exception $e) {
+    die('Database error: ' . $e->getMessage());
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,72 +44,41 @@ if (!isset($_SESSION["student"])) {
 </head>
 <body>
     <nav class="navbar">
-        <h5>Welcome <?=$_SESSION["name"]?></h5>
+        <h5>Welcome <?php echo $studentName; ?></h5>
         <a href="../includes/logout.php" class="btn btn-warning">Logout</a>
     </nav>
 
     <div>
-
-        <!--
-            get the session section
-            get the date today
-            find the session section === calendar database section
-            find the date today === calendar database date
-        -->
-
         <?php
-        date_default_timezone_set('Asia/Manila');
-        $currentDateTime = date('Y-m-d');
-        
-        $studentSection = $_SESSION['section'];
-        echo $studentSection;
-        require_once "../connection/database.php";
-
-        try {
-            $stmt = $conn->prepare('SELECT date FROM calendar WHERE section = ?');
-            $stmt->bind_param('s', $studentSection);
-            $stmt->execute();
-            $results = $stmt->get_result();
-            
-        } catch (Exception $e) {
-            die('Database error: ' . $e->getMessage());
-        }
-
         $matchFound = false;
 
-        // fix this plss
         if ($results->num_rows > 0) {
             while ($row = $results->fetch_assoc()) {
-        // Compare the 'date' from the database to the current date
-            if ($row["date"] === $currentDateTime) {
-                echo "Yes<br>";
-                $matchFound = true;
-                break;
+                if (isAttendanceAllowed($row["date"], $row["timein"], $row["timeout"], $currentDateTime)) {
+                    echo $row["date"], $row["timein"], $row["timeout"], $currentDateTime;
+                    $matchFound = true;
+                    break;
+                }
             }
-        }
 
-        if (!$matchFound) {
-            echo "No matching date found.<br>";
-        }
-
+            if (!$matchFound) {
+                echo "No matching date found.<br>";
+            }
         } else {
             echo "No results found.";
         }
-
         ?>
 
-        <?php
-            if($matchFound){
-                echo"<h2>Attendance</h2>";
-                echo "<form>";
-                echo "<input>";
-                echo   "<button type='submit' name='approve'>Approve</button>";
-                echo "</form>";
-                echo "</div>";
-            }
-        ?>
+        <?php if ($matchFound): ?>
+            <h4>Attendance</h4>
+            <form action='../includes/attendance.php' method='POST'>
+                <input type='hidden' name='student_id' value='<?php echo $studentId; ?>'>
+                <button type='submit' name='present'>Present</button>
+            </form>
+        <?php endif; ?>
         
-    <main class="report">
+        <main class="report">
+        <main class="report">
         <h2 class="title-report">Report</h2>
         <form action="../includes/problemreport.php" method="POST" class="form">
             <select id="laboratory" name="laboratory" class="input" required>
@@ -104,6 +98,7 @@ if (!isset($_SESSION["student"])) {
             <textarea name="description" placeholder="Enter Description" class="textarea"></textarea>
             <button type="submit" name="submit-report" class="submit">Report</button>
         </form>
-    </main>
+        </main>
+    </div>
 </body>
 </html>
