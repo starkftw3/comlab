@@ -51,7 +51,8 @@ if (isset($_SESSION["student"])) {
                         echo "<div class='alert alert-danger'>All fields are required</div>";
             
                     }else{
-                                    
+                        
+                        require_once "../connection/database.php";
                         // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
                         if ($stmt = $conn->prepare('SELECT firstname, lastname, middlename, section, password, status FROM student WHERE studentid = ?')) {
                             $stmt->bind_param('s', $_POST['studentid']);

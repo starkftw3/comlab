@@ -12,14 +12,17 @@ $studentName = $_SESSION["name"];
 $studentSection = $_SESSION['section'];
 $studentId = $_SESSION['studentid'];
 
-// Function to check if an event is valid for marking attendance
-function isAttendanceAllowed($eventDate, $eventTimeIn, $eventTimeOut, $currentDateTime) {
-    return ($eventDate === $currentDateTime && $eventTimeIn <= $currentDateTime && $eventTimeOut >= $currentDateTime);
+// Function to check if an day and time  is valid for marking attendance
+function isAttendanceAllowed($eventDate, $eventTimeIn, $eventTimeOut, $currentTime, $currentDate) { //2023-09-15, 15:00:00, 17:00:00, 15:00:00
+    return ($eventDate === $currentDate && $eventTimeIn <= $currentTime && $eventTimeOut >= $currentTime); 
+            //2023-09-15 === 2023-09-15 && 20:50:00  15:00:00 <= 16:00:00 && 17:00:00 >= 16:00:00 
 }
 
 try {
     date_default_timezone_set('Asia/Manila');
-    $currentDateTime = date('Y-m-d H:i:s');
+    $currentDate = date("Y-m-d");
+    $currentTime = date("H:i:s");
+    echo $currentTime;
 
     // Query the database to get upcoming events for the student's section
     $stmt = $conn->prepare('SELECT date, timein, timeout FROM calendar WHERE section = ?');
@@ -49,13 +52,29 @@ try {
     </nav>
 
     <div>
+
+        <!--get the day_of_week in database
+            get the dateToday (date function) convert it to day(example: Monday)
+            check the day of dateToday
+            get the timenow
+            get the timein in database
+            get the timeout in database
+
+            if
+
+            if(day_of_week === dateToday)
+                if(timein >= timenow && timeout <= time)
+                    markAttendance = true;
+                    break;
+
+        -->
         <?php
         $matchFound = false;
 
         if ($results->num_rows > 0) {
             while ($row = $results->fetch_assoc()) {
-                if (isAttendanceAllowed($row["date"], $row["timein"], $row["timeout"], $currentDateTime)) {
-                    echo $row["date"], $row["timein"], $row["timeout"], $currentDateTime;
+                if (isAttendanceAllowed($row["date"], $row["timein"], $row["timeout"], $currentTime, $currentDate)) {
+                    echo $row["date"]," ", $row["timein"]," ", $row["timeout"]," ", $currentTime, " ", $currentDate;
                     $matchFound = true;
                     break;
                 }

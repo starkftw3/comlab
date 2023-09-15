@@ -16,7 +16,7 @@ require_once "../connection/database.php";
 $status = 'pending';
 
 try {
-    $stmt = $conn->prepare('SELECT studentid, firstname, lastname, middlename, section, email FROM problemreport WHERE status = ?');
+    $stmt = $conn->prepare('SELECT studentid, firstname, lastname, middlename, section, email FROM student WHERE status = ?');
     $stmt->bind_param('s', $status);
     $stmt->execute();
     $result = $stmt->get_result();
