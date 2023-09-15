@@ -38,68 +38,71 @@ if (isset($_SESSION["student"])) {
     </nav>
 
     <div class="container">
-            <?php
-            if (isset($_POST["studentlogin"])) {
-                 $studentid = $_POST["studentid"];
-                 $password = $_POST["password"];
-            
-                if (empty($studentid) OR empty($password)) {
-                    echo "<div class='alert alert-danger'>All fields are required</div>"; 
-                    
-                }else{        
-                    require_once "../connection/database.php";
-                    // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-                    if ($stmt = $conn->prepare('SELECT firstname, lastname, middlename, password, status FROM student WHERE studentid = ?')) {
-                        $stmt->bind_param('s', $_POST['studentid']);
-                        $stmt->execute();
-                        // Store the result so we can check if the account exists in the database.
-                        $stmt->store_result();
-                        if ($stmt->num_rows > 0) {
-                            $stmt->bind_result($firstname, $lastname, $middlename, $dbpassword, $status);
-                            $stmt->fetch();
-                            // Account exists, now we verify the password.
+        <div>
+            <form class="form" action="studentlogin.php" method="POST">
+                <span class="title">Student Login </span>
 
-                            if (password_verify($_POST['password'], $dbpassword)) {
-                                if($status === 'pending')
-                                echo "<div class='alert alert-success'>Your account is still pending</div>";
-                                // Verification success! User has logged-in!
-                                // Create sessions, so we know the user is logged in, they basically act like cookies but remember the data on the server.
-                                else if($status === 'approved'){
-                                    session_regenerate_id();
-                                    $_SESSION['student'] = TRUE;
-                                    $_SESSION['name'] = $firstname . " " . $middlename . " " . $lastname;
-                                    $_SESSION['studentid'] = $_POST['studentid'];
-                                    header('Location: home.php');
-                                }
-                                else if($status === 'rejected'){
-                                    echo "<div class='alert alert-danger'>Your account is reject. Contact Admin.</div>";
+                <?php
+                if (isset($_POST["studentlogin"])) {
+                     $studentid = $_POST["studentid"];
+                     $password = $_POST["password"];
+            
+                    if (empty($studentid) OR empty($password)) {
+                        echo "<div class='alert alert-danger'>All fields are required</div>";
+            
+                    }else{
+                                    
+                        // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
+                        if ($stmt = $conn->prepare('SELECT firstname, lastname, middlename, section, password, status FROM student WHERE studentid = ?')) {
+                            $stmt->bind_param('s', $_POST['studentid']);
+                            $stmt->execute();
+                            // Store the result so we can check if the account exists in the database.
+                            $stmt->store_result();
+                            if ($stmt->num_rows > 0) {
+                                $stmt->bind_result($firstname, $lastname, $middlename, $section,  $dbpassword, $status);
+                                $stmt->fetch();
+                                // Account exists, now we verify the password.
+                                if (password_verify($_POST['password'], $dbpassword)) {
+                                    if($status === 'pending')
+                                    echo "<div class='alert alert-success'>Your account is still pending</div>";
+                                    // Verification success! User has logged-in!
+                                    // Create sessions, so we know the user is logged in, they basically act like cookies but remember the data on the server.
+                                    else if($status === 'approved'){
+                                        session_regenerate_id();
+                                        $_SESSION['student'] = TRUE;
+                                        $_SESSION['name'] = $firstname . " " . $middlename . " " . $lastname;
+                                        $_SESSION['section'] = $section;
+                                        $_SESSION['studentid'] = $_POST['studentid'];
+                                        header('Location: home.php');
+                                    }
+                                    else if($status === 'rejected'){
+                                        echo "<div class='alert alert-danger'>Your account is reject. Contact Admin.</div>";
+                                    }
+                                } else {
+                                    // Incorrect password
+                                    echo "<div class='alert alert-danger'>Email or Password does not match</div>";
                                 }
                             } else {
-                                // Incorrect password
-                                echo "<div class='alert alert-danger'>Email or Password does not match</div>";
+                                // Incorrect username
+                                echo "<div class='alert alert-danger'>Email or Password Email does not match</div>";
                             }
-                        } else {
-                            // Incorrect username
-                            echo "<div class='alert alert-danger'>Email or Password Email does not match</div>";
+                            $stmt->close();
                         }
-                        $stmt->close();
                     }
+            
                 }
-                
-            }
-            ?>
-
-        <form class="form" action="studentlogin.php" method="POST">
-            <span class="title">Student Login </span>
-            <label>
-                <input required="" placeholder="Student-ID" type="text" name="studentid" class="input">
-            </label>
-            <label>
-                <input required="" placeholder="Password" type="password" name="password" class="input">
-            </label>
-            <button type="submit" name="studentlogin" class="submit">Login</button>
-            <p class="signin">No Account ? <a href="studentregister.php">Signup</a> </p>
-        </form>
+                ?>
+            
+                <label>
+                    <input required="" placeholder="Student-ID" type="text" name="studentid" class="input">
+                </label>
+                <label>
+                    <input required="" placeholder="Password" type="password" name="password" class="input">
+                </label>
+                <button type="submit" name="studentlogin" class="submit">Login</button>
+                <p class="signin">No Account ? <a href="studentregister.php">Signup</a> </p>
+            </form>
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

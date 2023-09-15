@@ -40,88 +40,80 @@ if (isset($_SESSION["professor"])) {
 
     <div class="container">
         <div >
-            <?php
-                $errors = array();
-                $success = "";
-
-                if (isset($_POST["professor-submit"])) {
-                $firstname = $_POST["firstname"];
-                $lastname = $_POST["lastname"];
-                $middlename = $_POST["middlename"];
-                $facultyid = $_POST["facultyid"];
-                $email = $_POST["email"];
-                $password = $_POST["password"];
-                $passwordRepeat = $_POST["repeat_password"];
-                
-                
-
-                if (!preg_match('/^\d{2}-\d{2}-\d{4}$/', $facultyid)) {
-                    array_push($errors,"Invalid student ID format (e.g., 11-22-3333)");
-                }
-                
-                if (empty($firstname) OR empty($lastname) OR empty($email) OR empty($facultyid)  OR empty($passwordRepeat) OR empty($password)) {
-                    array_push($errors,"All fields are required");
-                }
-
-                if (strlen($password)<8) {
-                    array_push($errors,"Password must be at least 8 charactes long");
-                }
-
-                if ($password!==$passwordRepeat) {
-                    array_push($errors,"Password does not match");
-
-                }else{
-                    require_once "../connection/database.php";
-                    if($stmt = $conn->prepare('SELECT firstname, password FROM student WHERE studentid = ?')){
-                        $stmt->bind_param('s', $_POST['studentid']);
-                        $stmt->execute();
-                        $stmt->store_result();
-
-                        if ($stmt->num_rows > 0) {
-                            // Student-ID already exists            
-                            array_push($errors,"Student-ID exists, please choose another!");
-                        
-                        } else {
-                            if(empty($middlename)){
-                                $middlename = NULL;
-                            }
-                            // Student-ID doesn't exists, insert new account
-                            if ($stmt = $conn->prepare('INSERT INTO faculty (firstname, lastname, middlename, facultyid, email, password, status) VALUES (?, ?, ?, ?, ?, ?, ?)')) {
-                                $passwordhash = password_hash($password, PASSWORD_DEFAULT);
-                                $defaultstatus = 'pending';
-                                $stmt->bind_param('sssssss', $firstname, $lastname, $middlename, $facultyid, $email, $passwordhash, $defaultstatus);
-                                $stmt->execute();
-                                $success = "You are registered successfully.";
-
-                            } else {
-                                array_push($errors,"Something went wrong");
-                            }
-                        }
-                        $stmt->close();
-                    }else {
-                        array_push($errors,"Registration failed due to a technical issue. Please try again later.");
-                    }
-
-                    $conn->close();
-
-                }
-                }
-            ?>
-
-            <form class="form" action="professorregister.php" method="POST">
+        <form class="form" action="professorregister.php" method="POST">
                 <span class="title">Faculty Register </span>
                 <span class="message">Computer Laboratory Monitoring System.</span>
-                <?php
+            <?php
+                $errors = array();
+
+                if (isset($_POST["professor-submit"])) {
+                    $firstname = $_POST["firstname"];
+                    $lastname = $_POST["lastname"];
+                    $middlename = $_POST["middlename"];
+                    $facultyid = $_POST["facultyid"];
+                    $email = $_POST["email"];
+                    $password = $_POST["password"];
+                    $passwordRepeat = $_POST["repeat_password"];
+                    
+
+                    if (!preg_match('/^\d{2}-\d{2}-\d{4}$/', $facultyid)) {
+                        array_push($errors,"Invalid faculty ID format (e.g., 11-22-3333)");
+                    }
+                    
+                    if (empty($firstname) OR empty($lastname) OR empty($email) OR empty($facultyid)  OR empty($passwordRepeat) OR empty($password)) {
+                        array_push($errors,"All fields are required");
+                    }
+
+                    if (strlen($password)<8) {
+                        array_push($errors,"Password must be at least 8 charactes long");
+                    }
+
+                    if ($password!==$passwordRepeat) {
+                        array_push($errors,"Password does not match");
+
+                    }
                     if(count($errors)> 0){
                         foreach($errors as $error){
                             echo "<div class='alert alert-danger'>$error</div>";
                         }
+                    }else{
+                        require_once "../connection/database.php";
+                        if($stmt = $conn->prepare('SELECT firstname, password FROM faculty WHERE facultyid = ?')){
+                            $stmt->bind_param('s', $_POST['facultyid']);
+                            $stmt->execute();
+                            $stmt->store_result();
+
+                            if ($stmt->num_rows > 0) {
+                                // faculty-ID already exists            
+                                echo "<div class='alert alert-danger'>Faculty-ID exist</div>";
+                            
+                            } else {
+                                if(empty($middlename)){
+                                    $middlename = NULL;
+                                }
+                                // faculty-ID doesn't exists, insert new account
+                                if ($stmt = $conn->prepare('INSERT INTO faculty (firstname, lastname, middlename, facultyid, email, password, status) VALUES (?, ?, ?, ?, ?, ?, ?)')) {
+                                    $passwordhash = password_hash($password, PASSWORD_DEFAULT);
+                                    $defaultstatus = 'pending';
+                                    $stmt->bind_param('sssssss', $firstname, $lastname, $middlename, $facultyid, $email, $passwordhash, $defaultstatus);
+                                    $stmt->execute();
+                                    echo "<div class='alert alert-success'>You are registered successfully.</div>";
+
+                                } else {
+                                    array_push($errors,"Something went wrong");
+                                }
+                            }
+                            $stmt->close();
+                        }else {
+                            array_push($errors,"Registration failed due to a technical issue. Please try again later.");
+                        }
+
+                        $conn->close();
+
                     }
-                    if(!empty($success)){
-                        echo "<div class='alert alert-success'>$success</div>";
-                    }
-                    
-                ?>
+                }
+            ?>
+            
                 <label>
                     <input required="" placeholder="Faculty-ID" type="text" name="facultyid" class="input">
                 </label>

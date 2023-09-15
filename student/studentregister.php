@@ -13,7 +13,6 @@ if (isset($_SESSION["student"])) {
     <title>Student Registration</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <link rel="stylesheet" href="./style-student.css">
-    <script src="validation.js" defer></script>
 </head>
 <body>
     <nav class="navbar navbar-light bg-light">
@@ -39,9 +38,11 @@ if (isset($_SESSION["student"])) {
     </nav>
     <div class="container">
         <div >
+        <form class="form" action="studentregister.php" method="POST">
+                <span class="title">Student Register </span>
+                <span class="message">Computer Laboratory Monitoring System.</span>
             <?php
                 $errors = array();
-                $success = "";
 
                 if (isset($_POST["student-submit"])) {
                 $firstname = $_POST["firstname"];
@@ -54,7 +55,6 @@ if (isset($_SESSION["student"])) {
                 $passwordRepeat = $_POST["repeat_password"];
                 
                 
-
                 if (!preg_match('/^\d{2}-\d{2}-\d{4}$/', $studentid)) {
                     array_push($errors,"Invalid student ID format (e.g., 11-22-3333)");
                 }
@@ -70,8 +70,13 @@ if (isset($_SESSION["student"])) {
 
                 if ($password!==$passwordRepeat) {
                     array_push($errors,"Password does not match");
-
+                } 
+                if(count($errors)> 0){
+                    foreach($errors as $error){
+                        echo "<div class='alert alert-danger'>$error</div>";
+                    }
                 }else{
+                   
                     require_once "../connection/database.php";
                     if($stmt = $conn->prepare('SELECT firstname, password FROM student WHERE studentid = ?')){
                         $stmt->bind_param('s', $_POST['studentid']);
@@ -80,11 +85,11 @@ if (isset($_SESSION["student"])) {
 
                         if ($stmt->num_rows > 0) {
                             // Student-ID already exists            
-                            array_push($errors,"Student-ID exists, please choose another!");
+                            echo "<div class='alert alert-danger'>Student-ID already exist</div>";
                         
                         } else {
                             if(empty($middlename)){
-                                $middlename = NULL;
+                                $middlename = NULL; 
                             }
                             // Student-ID doesn't exists, insert new account
                             if ($stmt = $conn->prepare('INSERT INTO student (firstname, lastname, middlename, studentid, section, email, password, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')) {
@@ -92,7 +97,7 @@ if (isset($_SESSION["student"])) {
                                 $defaultstatus = 'pending';
                                 $stmt->bind_param('ssssssss', $firstname, $lastname, $middlename, $studentid, $section, $email, $passwordhash, $defaultstatus);
                                 $stmt->execute();
-                                $success = "You are registered successfully.";
+                                echo "<div class='alert alert-success'>You Registered Successfully</div>";
 
                             } else {
                                 array_push($errors,"Something went wrong");
@@ -106,23 +111,9 @@ if (isset($_SESSION["student"])) {
                     $conn->close();
 
                 }
-                }
+            }
             ?>
 
-            <form class="form" action="studentregister.php" method="POST">
-                <span class="title">Student Register </span>
-                <span class="message">Computer Laboratory Monitoring System.</span>
-                <?php
-                    if(count($errors)> 0){
-                        foreach($errors as $error){
-                            echo "<div class='alert alert-danger'>$error</div>";
-                        }
-                    }
-                    if(!empty($success)){
-                        echo "<div class='alert alert-success'>$success</div>";
-                    }
-                    
-                ?>
                 <div class="flex">
                     <label>
                         <input required="" placeholder="Student-ID" type="text" name="studentid" class="input">
@@ -151,7 +142,7 @@ if (isset($_SESSION["student"])) {
                 <label>
                     <input required="" placeholder="Repeat Password" type="password" name="repeat_password" class="input">
                 </label>
-                <button type="submit" name="student-submit"class="submit">Submit</button>
+                <button type="submit" name="student-submit" class="submit">Submit</button>
                 <p class="signin">Already have an acount ? <a href="studentlogin.php">Signin</a> </p>
             </form>
         </div>   
